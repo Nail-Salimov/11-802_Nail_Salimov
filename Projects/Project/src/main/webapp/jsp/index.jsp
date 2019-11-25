@@ -39,7 +39,7 @@
             </c:if>
             <input type="text" name="name" placeholder="name"/>
             <input type="password" name="password" placeholder="password"/>
-            <input type="text" id = "email" name="mail" placeholder="email address" onblur = "f()"/>
+            <input type="text" name="mail" placeholder="email address" onblur = "f()"/>
             <button id = "validate">create</button>
             <p class="message">Already registered? <a href="#">Sign In</a></p>
         </form>
@@ -49,7 +49,7 @@
                     <c:out value="${wrong_parameter}"/>
                 </div>
             </c:if>
-            <input type="text" name="mail" placeholder="mail"/>
+            <input type="text" id = "email"  name="mail" placeholder="mail"/>
             <input type="password" name="password" placeholder="password"/>
             <input type="checkbox" name="remember_me"/>
             <button>login</button>

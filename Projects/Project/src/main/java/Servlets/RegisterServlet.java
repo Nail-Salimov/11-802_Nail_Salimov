@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 
 @WebServlet("/register")
 public class RegisterServlet  extends HttpServlet {
@@ -38,7 +39,8 @@ public class RegisterServlet  extends HttpServlet {
 
         if(!repository.isExist(mail)){
             repository.save(new User(name, password, mail));
-            Long id = (Long) repository.findUser(mail, password).get().getId();
+            Optional<User> userOptional = repository.findUser(mail, password);
+            Long id = (Long) userOptional.get().getId();
             repository.saveImage(id, "28538.png");
             resp.sendRedirect(req.getContextPath() + "/login");
         } else {

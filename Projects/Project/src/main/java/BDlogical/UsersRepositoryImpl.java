@@ -4,6 +4,7 @@ import Model.Comment;
 import Model.Post;
 import Model.User;
 import com.sun.org.apache.xerces.internal.impl.dv.XSSimpleType;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -16,7 +17,7 @@ public class UsersRepositoryImpl implements UsersRepository {
 
     private static final String INSERT = "INSERT INTO user_date (name, password, mail) VALUES (?, ?, ?)";
     private static final String IS_EXIST = "SELECT 1 FROM user_date WHERE  mail = ?";
-    private static final String FIND_USER = "SELECT * FROM user_date WHERE mail = ? and password = ?";
+    private static final String FIND_USER = "SELECT * FROM user_date WHERE mail = ?";
     private static final String FIND_BY_ID = "SELECT * FROM user_date WHERE id = ?";
 
     private static final String INSERT_POST = "INSERT INTO users_post (users_id, post_image, post_text) VALUES (?, ?, ?)";
@@ -70,7 +71,7 @@ public class UsersRepositoryImpl implements UsersRepository {
         try {
             PreparedStatement statement = connection.prepareStatement(INSERT);
             statement.setString(1, user.getName());
-            statement.setString(2, user.getPassword());
+            statement.setString(2, BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
             statement.setString(3, user.getMail());
 
             int affectedRows = statement.executeUpdate();
@@ -103,11 +104,13 @@ public class UsersRepositoryImpl implements UsersRepository {
         try {
             PreparedStatement statement = connection.prepareStatement(FIND_USER);
             statement.setString(1, mail);
-            statement.setString(2, password);
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
                 user = userRowMapper.mapRow(resultSet);
+                if(!BCrypt.checkpw(password, user.getPassword())){
+                    user = null;
+                }
             }
             return Optional.ofNullable(user);
         } catch (SQLException e) {
@@ -145,7 +148,7 @@ public class UsersRepositoryImpl implements UsersRepository {
         try {
             PreparedStatement statement = connection.prepareStatement(FIND_BY_ID);
             statement.setLong(1, id);
-            ;
+
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
